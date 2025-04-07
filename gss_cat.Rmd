@@ -1,0 +1,248 @@
+---
+title: "UNIT 5"
+author: "Mohd Musharraf Parvez"
+date: "2025-04-07"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+```{r}
+library(tidyverse)
+library(forcats)
+View(gss_cat)
+
+my_data <- gss_cat %>%
+  select(marital) %>%
+  filter(marital %in% c("Married",
+                         "Never married",
+                         "Divorced")) %>%
+  mutate(marital = fct_drop(marital))
+
+my_table <- table(my_data)
+View(my_table)
+
+
+#Use Chi-square goodness of fitness of fit test
+
+chisq.test(my_table)
+
+my_data %>%
+  table() %>%
+  chisq.test()
+
+#graphics
+
+my_data %>%
+  ggplot(aes(marital)) + geom_bar()
+```
+
+INTERPRETATION
+
+The chi-squared test shows a highly significant difference (p < 2.2e-16) between the observed marital status distribution in the bar chart (where "Married" is much higher than "Never married" and "Divorced") and a hypothesized distribution (likely an equal distribution). This means the observed marital status frequencies are very unlikely to have occurred by chance if the hypothesized distribution were true.
+
+
+```{r}
+my_data <- gss_cat %>%
+  select(race) %>%
+  filter(race %in% c("White",
+                        "Black", "Other")) %>%
+  mutate(race = fct_drop(race))
+
+my_table <- table(my_data)
+View(my_table)
+
+
+#chi sq test
+chisq.test(my_table)
+
+my_data %>%
+  table() %>%
+  chisq.test()
+
+#graphics
+my_data %>%
+  ggplot(aes(race)) + geom_bar()
+
+
+#INTERPRETATION
+#The chi-squared test shows an extremely significant difference (p < 2.2e-16) between the observed racial distribution in the bar chart (where "White" is overwhelmingly dominant compared to "Black" and "Other") and a hypothesized distribution (likely an equal distribution or a pre-defined expected distribution). This indicates that the observed racial frequencies are highly unlikely to have occurred by chance if the hypothesized distribution were true.
+
+```{r}
+```
+#INTERPRETATION
+#The chi-squared test shows an extremely significant difference (p < 2.2e-16) between the observed racial distribution in the bar chart (where "White" is overwhelmingly dominant compared to "Black" and "Other") and a hypothesized distribution (likely an equal distribution or a pre-defined expected distribution). This indicates that the observed racial frequencies are highly unlikely to have occurred by chance if the hypothesized distribution were true.
+
+
+```{r}
+my_data <- gss_cat %>%
+  select(partyid) %>%
+  filter(partyid %in% c("Ind,near rep",
+                        "Not str republican",
+                        "Independent",
+                        "Not str democrat",
+                        "Strong democrat",
+                        "Ind,near dem",
+                        "Strong republican",
+                        "Other party",
+                        "No answer")) %>%
+  mutate(partyid = fct_drop(partyid))
+
+my_table <- table(my_data)
+View(my_table)
+
+#chi sq
+chisq.test(my_table)
+
+my_data %>%
+  table() %>%
+  chisq.test()
+
+# graphics
+
+my_data %>%
+ggplot(aes(partyid)) + geom_bar()
+```
+
+INTERPRETATION
+
+The chi-squared test reveals a highly significant difference (p < 2.2e-16) between the observed political party affiliation distribution in the bar chart (with varying counts across categories and "No answer" being extremely low) and a hypothesized distribution (likely an equal distribution or a pre-defined expected distribution). This indicates that the observed party affiliation frequencies are extremely unlikely to have occurred by chance if the hypothesized distribution were true, suggesting a strong deviation from the expected pattern.
+```{r}
+#religon
+
+unique(gss_cat$relig)
+
+my_data5 <- gss_cat %>%
+  select(relig) %>%
+  filter(relig %in% c(
+    "Protestant",
+    "Orthodox-christian",
+    "None",
+    "Christian",
+    "Jewish",
+    "Catholic",
+    "Other",
+    "Inter-nondenominational",
+    "Hinduism",
+    "Moslem/islam",
+    "Buddhism",
+    "No answer",
+    "Native american",
+    "Other eastern",
+    "Don’t know"
+  )) %>%
+
+  mutate(relig = fct_drop(relig))
+
+my_table <- table(my_data5)
+View(my_table)
+
+#chi sq
+chisq.test(my_table)
+my_data5 %>%
+  table() %>%
+  chisq.test()
+
+# graphics
+
+my_data5 %>%
+ggplot(aes(relig)) + geom_bar()
+```
+
+INTERPRETATION
+
+The chi-squared test shows an overwhelmingly significant difference (p < 2.2e-16) between the observed religious affiliation distribution in the bar chart (where "Protestant" is dominant, followed by "Catholic" and "None," with other religions having very low counts) and a hypothesized distribution (likely an equal distribution or a pre-defined expected distribution). This indicates that the observed religious affiliation frequencies are exceptionally unlikely to have occurred by chance if the hypothesized distribution were true, demonstrating a strong deviation from the expected pattern.
+```{r}
+```
+
+```{r}
+#denom
+
+my_data <- gss_cat %>%
+  select(denom) %>%
+  filter(denom %in% c("Southern baptist",
+                        "Baptist-dk which",
+                        "No denomination",
+                      "Not applicable",
+                      "Lutheran-mo synod",
+                      "Other",
+                      "United methodist",
+                      "Episcopal",
+                      "Other lutheran",
+                      "Afr meth ep zion",
+                      "Am bapt ch in usa",
+                      "Other methodist",
+                      "Presbyterian c in us",
+                      "Methodist-dk which")) %>%
+  mutate(denom = fct_drop(denom))
+
+my_table <- table(my_data)
+View(my_table)
+
+#chi sq
+chisq.test(my_table)
+my_data %>%
+  table() %>%
+  chisq.test()
+#GRAPHICS FOR DENOM
+my_data %>%
+ggplot(aes(denom)) + geom_bar()
+```
+
+INTERPRETATION
+
+The chi-squared test shows an extremely significant difference (p < 2.2e-16) between the observed denominational affiliation distribution in the bar chart (where "Not applicable" is overwhelmingly dominant, and other denominations show varying, much lower counts) and a hypothesized distribution (likely an equal distribution or a pre-defined expected distribution). This indicates that the observed denominational frequencies are exceptionally unlikely to have occurred by chance if the hypothesized distribution were true, highlighting a strong deviation from the expected pattern, primarily due to the "Not applicable" category.
+
+```{r}
+my_data6 <- gss_cat %>%
+  select(tvhours) %>%
+  filter(tvhours %in% c("12",
+                        "NA",
+                        "2",
+                        "4",
+                        "1",
+                        "3",
+                        "0",
+                        "7",
+                        "5",
+                        "8",
+                        "10",
+                        "6",
+                        "15",
+                        "11",
+                        "24",
+                        "20",
+                        "13",
+                        "14",
+                        "21",
+                        "9",
+                        "16",
+                        "22",
+                        "18",
+                        "17",
+                        "23")) %>%
+  mutate(tvhours = as.factor(tvhours)) %>% # Convert to factor here
+  mutate(tvhours = fct_drop(tvhours))
+
+my_table <- table(my_data6)
+View(my_table)
+
+#chi sq
+chisq.test(my_table)
+
+my_data6 %>%
+  table() %>%
+  chisq.test()
+
+#GRAPHICS FOR tvhours
+my_data6 %>%
+ggplot(aes(tvhours)) + geom_bar()
+```
+
+INTERPRETATION
+
+
+The chi-squared test shows an overwhelmingly significant difference (p < 2.2e-16) between the observed distribution of TV viewing hours in the bar chart (heavily skewed towards lower hours, with a rapid decline and very low counts for higher hours) and a hypothesized distribution (likely an equal distribution or a pre-defined expected distribution). This indicates that the observed TV viewing hour frequencies are exceptionally unlikely to have occurred by chance if the hypothesized distribution were true, revealing a strong deviation from the expected pattern and highlighting the concentration of individuals watching less TV.
+
+`
