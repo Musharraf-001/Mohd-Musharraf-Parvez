@@ -1,0 +1,236 @@
+---
+title: "Order Tracking"
+author: "Mohd Musharraf Parvez"
+date: "2025-04-12"
+output:
+  html_document: default
+  pdf_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+Name Mohd Musharraf Parvez
+reg_no 24221028
+Under the guidance of Dr. Durgansh Sharma
+
+
+
+
+a. Problem Statement / Objective
+This dataset appears to come from an order tracking/inventory system for event managemrnt. Based on this, we can define the following business problem:
+
+Objective:
+To analyze the order processing workflow and identify patterns, delays, and performance metrics in shipping, assignment, and delivery to improve operational efficiency and customer satisfaction.
+
+
+
+the following packages were incorporated for this project:
+```{r}
+library(readxl)
+library(dplyr)
+library(ggplot2)
+library(lubridate)
+library(tidyverse)
+library(scales)
+```
+
+library(readxl)
+
+📘 Purpose: To read Excel files (.xls and .xlsx) directly into R.
+
+library(dplyr)
+
+🧹 Purpose: To manipulate and transform data efficiently using verbs like filter, mutate, group_by, summarise, etc.
+
+🔧 Used for:
+
+Filtering data
+
+Calculating summaries
+
+Creating new columns like Shipping_Delay
+
+library(ggplot2)
+
+📊 Purpose: For creating data visualizations using a powerful and flexible grammar of graphics.
+
+🔧 Used for:
+
+Bar charts
+
+Histograms
+
+Pie charts (with tweaks)
+
+Time series plots
+
+library(lubridate)
+
+🕒 Purpose: To work with dates and times easily and consistently.
+
+🔧 Used for:
+
+Parsing and formatting dates
+
+Calculating time differences like Delivery_Days
+
+library(tidyverse)
+
+🌐 Purpose: This is a meta-package that includes ggplot2, dplyr, readr, tibble, tidyr, purrr, and stringr.
+
+🔧 You don’t need both dplyr and tidyverse, since tidyverse already includes dplyr, ggplot2, and more.
+
+library(scales)
+
+🎚️ Purpose: To format axis labels and legends in ggplot2 plots (like percent, date formatting, currency).
+
+🔧 Used for:
+
+Customizing visual aesthetics
+
+Scaling values in plots
+
+
+
+```{r}
+# Load the data
+file_path <- "C:\\Users\\musha\\OneDrive\\Pictures\\Documents\\OT INVE.xlsx"
+df <- read_excel("C:\\Users\\musha\\OneDrive\\Pictures\\Documents\\OT INVE.xlsx")
+
+```
+
+
+```{r}
+df <- df %>%
+  mutate(
+    Order_Date = as.Date(Order_Date),
+    Status_Date = as.Date(Status_Date),
+    Estimated_Ship_Date = as.Date(Estimated_Ship_Date),
+    Actual_Ship_Date = as.Date(Actual_Ship_Date),
+    Delivery_Date = as.Date(Delivery_Date)
+  )
+```
+```{r}
+# Order status distribution
+status_dist <- df %>%
+  group_by(Current_Status) %>%
+  summarise(Count = n())
+```
+
+# Plot: Current Status
+```{r}
+ggplot(status_dist, aes(x = reorder(Current_Status, -Count), y = Count, fill = Current_Status)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(title = "Distribution of Order Status", x = "Status", y = "Number of Orders") +
+  theme_minimal()
+```
+This bar chart titled “Distribution of Order Status” gives a visual summary of how customer orders are currently progressing through different stages of the order fulfillment pipeline.
+
+📊 What the Graph Shows:
+The x-axis represents the number of orders for each status.
+
+The y-axis lists the various order statuses such as:
+
+Pending, Processing, Shipped, Delivered, etc.
+
+Each bar's length indicates how many orders fall into that status.
+
+The bars are color-coded by Current_Status for visual clarity (legend shown on the right).
+
+🔎 Key Observations:
+✅ Most Frequent Statuses:
+
+Processing and Delivered each have 2 orders, indicating that:
+
+Some orders are actively being worked on (Processing)
+
+Some have completed the cycle (Delivered)
+
+🟨 Other Statuses (1 Order Each):
+
+Every other status (e.g., Cancelled, Packing, Pending, etc.) has exactly 1 order.
+
+This shows a very even spread across different workflow stages, which may indicate:
+
+A variety of order types being handled simultaneously
+
+Small dataset (15 records), so small differences are visually significant
+
+⚠️ Cancelled, Backordered, On Hold
+
+These are potential bottlenecks or issues in the order cycle and might need attention if they grow in frequency.
+
+🧠 Business Insight:
+The system seems to be managing diverse order statuses, but:
+
+There is no clear majority status, suggesting a scattered workflow.
+
+If this is a real-world scenario, more orders should ideally move toward Delivered or Shipped.
+
+
+
+# Cancellation Reasons
+```{r}
+cancel_reason <- df %>%
+  filter(!is.na(Cancellation_Reason)) %>%
+  group_by(Cancellation_Reason) %>%
+  summarise(Count = n())
+```
+Each reason has only one cancellation, indicating a low and evenly spread cancellation rate.
+
+No single issue is dominant yet—but all three are critical to monitor in case of future spikes.
+
+
+# Plot: Cancellation Reasons
+```{r}
+ggplot(cancel_reason, aes(x = Cancellation_Reason, y = Count, fill = Cancellation_Reason)) +
+  geom_col() +
+  labs(title = "Reasons for Cancellation", x = "Reason", y = "Count") +
+  theme_minimal()
+```
+
+
+
+# Plot:order Stat
+```{r}
+# Group and count order statuses
+status_dist <- df %>%
+  group_by(Current_Status) %>%
+  summarise(Count = n()) %>%
+  mutate(Percentage = round(Count / sum(Count) * 100, 1),
+         Label = paste0(Current_Status, " (", Percentage, "%)"))
+
+# Create pie chart
+ggplot(status_dist, aes(x = "", y = Count, fill = Current_Status)) +
+  geom_col(width = 1, color = "white") +
+  coord_polar(theta = "y") +
+  geom_text(aes(label = Label), position = position_stack(vjust = 0.5), size = 3) +
+  labs(title = "Order Status Distribution (Pie Chart)") +
+  theme_void() +
+  theme(legend.position = "none")  # Remove legend if labels are inside
+
+```
+
+
+📊 Interpretation:
+There are 15 total orders, split across 15 different statuses (some statuses repeated).
+
+Each slice represents a status and the percentage of total orders it accounts for.
+
+🔍 Key Insights:
+Status	Percentage	Interpretation
+Delivered	13.3%	A good sign — orders are being completed
+Processing	13.3%	Indicates ongoing work on some orders
+All Others	6.7% each	Remaining orders are distributed across stages:
+Pending, Packing, Cancelled, On Hold, Returned, etc.
+🧠 Business Insight:
+The top 2 statuses (Processing + Delivered) show the most activity — suggesting efficient flow.
+
+The rest are evenly distributed, possibly due to:
+
+A small dataset
+
+Or a wide variety of order scenarios (like backorders, returns, fulfillment delays)
